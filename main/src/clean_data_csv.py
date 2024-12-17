@@ -100,7 +100,6 @@ def clean_data(df):
     df = imput_data(df)
     df['sales_number'] = df.groupby(['CodeProduit', 'Pays', 'Date'])['CodeProduit'].transform('count').astype(int)
     df = df.drop_duplicates()
-    df.duplicated().sum()
     # Group by 'CodeProduit' and calculate total sales
     total_sales = df.groupby('CodeProduit')['sales_number'].sum()
 
@@ -108,8 +107,7 @@ def clean_data(df):
     valid_products = total_sales[total_sales >= 30].index
     # Keep only rows with valid CodeProduit
     df = df[df['CodeProduit'].isin(valid_products)]
-    # GVerify total sales > 30
-    total_sales = df.groupby('CodeProduit')['sales_number'].sum()
+
     df = df.reset_index(drop=True)
     df.to_excel('Cleaned_Sales_Data.xlsx', index=False)
     print('Cleaning Sales Data is Done !')

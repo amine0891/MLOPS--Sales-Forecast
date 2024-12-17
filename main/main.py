@@ -2,7 +2,7 @@ import pandas as pd
 from fastapi import FastAPI, Body
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from src.data_preprocessing_training import  predict_for_future_date, fill_missing_dates
+from src.data_preprocessing_training import  predict_for_future_date, fill_missing_dates, preprocess_data
 import mlflow.pyfunc
 from dotenv import load_dotenv
 import os
@@ -18,8 +18,6 @@ os.environ["MLFLOW_TRACKING_PASSWORD"] = DagsHub_token
 mlflow.set_tracking_uri('https://dagshub.com/mohamedhassine33/MLOPS.mlflow')  # your mlfow tracking uri
 mlflow.set_experiment("sales-forecast-experiment1")
 
-
-
 class PredictionInput(BaseModel):
     date: str
     product_code: str
@@ -28,7 +26,7 @@ class PredictionInput(BaseModel):
 
 # let's call the model from the model registry ( in production stage)
 
-df_mlflow = mlflow.search_runs(filter_string="metrics.mse_score_test < 1")
+df_mlflow = mlflow.search_runs(filter_string="metrics.mse_score_test > 0.018")
 run_id = df_mlflow.loc[df_mlflow['metrics.mse_score_test'].idxmin()]['run_id']
 
 logged_model = f'runs:/{run_id}/ML_models'

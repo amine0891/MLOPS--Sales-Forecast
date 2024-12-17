@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 import pickle
+import math
 
 def fill_missing_dates(df, start_date=None, end_date=None):
 
@@ -73,10 +74,10 @@ def prepare_data(df):
 
 
 
-def preprocess_data(df):
+def preprocess_data(df, lags=15):
     df_lags = df.copy()
-    df_lags['sales_number_lag_1'] = df_lags.groupby(['CodeProduit', 'Pays'])['sales_number'].shift(1)
-    df_lags['sales_number_lag_7'] = df_lags.groupby(['CodeProduit', 'Pays'])['sales_number'].shift(7)
+    for i in range(1, lags+1):
+        df_lags[f'sales_number_lag_{i}'] = df_lags.groupby(['CodeProduit', 'Pays'])['sales_number'].shift(i)
     df_lags = df_lags.fillna(0)
     return df_lags
 
@@ -85,7 +86,7 @@ def process_and_split_data(df):
     preprocessed_data = prepare_data(df)
     X = preprocessed_data.drop(columns=["sales_number"])
     y = preprocessed_data["sales_number"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=False)
 
     return X_train, X_test, y_train, y_test
 
@@ -94,8 +95,7 @@ def predict_for_future_date(df, product_code, country, target_date, model):
     product_country_data = df[(df['CodeProduit'] == product_code) & (df['Pays'] == country)]
     product_country_data.index = pd.to_datetime(product_country_data.index)
     product_country_data = preprocess_data(product_country_data)
-    latest_data = product_country_data[product_country_data.index <= target_date].tail(8)
-
+    latest_data = product_country_data[product_country_data.index <= target_date].tail(15)
     current_date = latest_data.index.values[-1]
 
     forecast_results = []
@@ -107,7 +107,7 @@ def predict_for_future_date(df, product_code, country, target_date, model):
         predicted_sales = model.predict(current_sample)
         forecast_results.append({
             'Date': current_date,
-            'predicted_sales': predicted_sales[0]
+            'predicted_sales': round(predicted_sales[0])
         })
 
         # Step 6: Update the dataset for the next day's forecast
@@ -118,8 +118,10 @@ def predict_for_future_date(df, product_code, country, target_date, model):
             'CodeProduit': [product_code],
             'Pays': [country],
             'sales_number': [predicted_sales[0]],
-            'sales_number_lag_1': [latest_data['sales_number'].values[-1]],
-            'sales_number_lag_7': [latest_data['sales_number'].values[0]]
+            **{
+                f'sales_number_lag_{i}': [latest_data['sales_number'].values[-i]]
+                for i in range(1, 16)
+            }
         }, index=[new_date])
 
         # Add the new row to the data

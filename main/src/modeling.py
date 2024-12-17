@@ -5,11 +5,11 @@ from data_preprocessing_training import process_and_split_data
 import pandas as pd
 from dotenv import load_dotenv
 import mlflow
-from treatement import XGBoostModel, MLPRegressorModel
+from treatement import XGBoostModel, LGBMRegressorModel
 
 # Affect Daghsub credentials
 
-load_dotenv("src/.env")
+load_dotenv("./src/.env")
 DagsHub_username = os.getenv("DagsHub_username")
 DagsHub_token = os.getenv("DagsHub_token")
 os.environ['MLFLOW_TRACKING_USERNAME'] = DagsHub_username
@@ -28,5 +28,5 @@ df = pd.read_excel(data_url)
 # cleaning and preprocessing
 X_train, X_test, y_train, y_test = process_and_split_data(df)
 XGBoostModel(data_url, version, df, X_train, X_test, y_train, y_test)
-MLPRegressorModel(data_url, version, df, X_train, X_test, y_train, y_test)
+LGBMRegressorModel(data_url, version, df, X_train, X_test, y_train, y_test)
 

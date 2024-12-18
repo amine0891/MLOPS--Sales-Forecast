@@ -2,7 +2,7 @@ import pandas as pd
 from fastapi import FastAPI, Body
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from src.data_preprocessing_training import  predict_for_future_date, fill_missing_dates, preprocess_data
+from src.data_preprocessing_training import  predict_for_future_date
 import mlflow.pyfunc
 from dotenv import load_dotenv
 import os

@@ -1,4 +1,5 @@
 .venv
 main/src/.env
+monitoring/.env
 main/src/__pycache__
 main/__pycache__/

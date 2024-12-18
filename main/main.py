@@ -26,7 +26,7 @@ class PredictionInput(BaseModel):
 
 # let's call the model from the model registry ( in production stage)
 
-df_mlflow = mlflow.search_runs(filter_string="metrics.mse_score_test > 0.018")
+df_mlflow = mlflow.search_runs(filter_string="metrics.mse_score_test < 0.05")
 run_id = df_mlflow.loc[df_mlflow['metrics.mse_score_test'].idxmin()]['run_id']
 
 logged_model = f'runs:/{run_id}/ML_models'

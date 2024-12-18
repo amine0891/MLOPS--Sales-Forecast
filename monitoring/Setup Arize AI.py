@@ -31,7 +31,7 @@ os.environ["MLFLOW_TRACKING_PASSWORD"] = DagsHub_token
 
 #setup mlflow
 mlflow.set_tracking_uri('https://dagshub.com/mohamedhassine33/MLOPS.mlflow') #your mlfow tracking uri
-mlflow.set_experiment("fraud-detector-experiment")
+mlflow.set_experiment("sales-forecast-experiment1")
 
 #read the data
 raw_train = pd.read_excel(data_url)
@@ -84,7 +84,7 @@ API_KEY = os.getenv("API_KEY")
 arize_client = Client(space_key=SPACE_KEY, api_key=API_KEY)
 
 model_id = (
-    "Sales-Forecast-detector-model"  # This is the model name that will show up in Arize
+    "Sales-Forecast-model"  # This is the model name that will show up in Arize
 )
 model_version = "v2"  # Version of model - can be any string
 
